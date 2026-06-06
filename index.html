@@ -59,7 +59,7 @@
 
 <div class="container">
   <h2>Sistem Rekomendasi Film Cinema XXI</h2>
-  <p>Masukkan riwayat pencarian film atau genre Anda untuk mendapatkan rekomendasi tontonan dari AI.</p>
+  <p>Masukkan riwayat film atau genre untuk mendapatkan rekomendasi tontonan dari AI.</p>
 
   <input id="searchQuery" placeholder="contoh: Spider-Man, Action, Horor komedi...">
 
@@ -75,9 +75,9 @@
   <div id="result" class="box">Belum dianalisis.</div>
 
   <h3>Generate Poster Film Khusus (AI):</h3>
-  <p style="font-size: 14px; color: #666;">AI akan membuat poster film fiktif berdasarkan selera riwayat Anda.</p>
+  <p style="font-size: 14px; color: #666;">AI akan membuat poster film fiktif berdasarkan rekomendasi Anda.</p>
   <button id="generateBtn" disabled onclick="generatePoster()">Buat Poster AI</button>
-  <div id="imageStatus" class="box" style="border:none; background:none; padding:0; min-height: auto; margin-top: 10px;">Belum ada poster.</div>
+  <div id="imageStatus" class="box" style="border:none; background:none; padding:0; min-height:auto; margin-top:10px;">Belum ada poster.</div>
   <img id="aiImage">
 
 </div>
@@ -86,7 +86,7 @@
 let riwayatPencarian = [];
 let hasilAnalisis = "";
 
-// Sesuaikan dengan endpoint backend Gemini kamu
+// Endpoint backend Gemini
 const ANALYZE_API = "https://activity-ai-backend-hufc-ahmadhabib01012005-7558s-projects.vercel.app/api/analyze";
 const IMAGE_API = "https://activity-ai-backend-hufc-ahmadhabib01012005-7558s-projects.vercel.app/api/generate-image";
 
@@ -115,7 +115,7 @@ function tambahRiwayat() {
 }
 
 async function dapatkanRekomendasi() {
-  if (riwayatPencarian.length === 0) return alert("Tambahkan riwayat pencarian terlebih dahulu!");
+  if (riwayatPencarian.length === 0) return alert("Tambahkan riwayat film terlebih dahulu!");
   document.getElementById("result").innerText = "Menganalisis selera film Anda...";
   resetPoster();
 
@@ -126,7 +126,7 @@ async function dapatkanRekomendasi() {
     const res = await fetch(ANALYZE_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ activities: daftarRiwayat })
+      body: JSON.stringify({ search_history: daftarRiwayat })
     });
 
     const json = await res.json();
@@ -134,7 +134,7 @@ async function dapatkanRekomendasi() {
     document.getElementById("result").innerText = hasilAnalisis || json.error || "Tidak ada rekomendasi yang ditemukan.";
 
     if (hasilAnalisis) {
-      btnGenerate.disabled = false; // aktifkan tombol poster setelah rekomendasi muncul
+      btnGenerate.disabled = false; // tombol poster aktif
     }
 
   } catch {
@@ -154,19 +154,19 @@ async function generatePoster() {
     const res = await fetch(IMAGE_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ activities: hasilAnalisis })
+      body: JSON.stringify({ recommendation: hasilAnalisis })
     });
 
     const json = await res.json();
     if (json.image) {
       img.src = `data:image/png;base64,${json.image}`;
       img.style.display = "block";
-      status.innerText = "Poster berhasil dibuat berdasarkan selera Anda!";
+      status.innerText = "Poster berhasil dibuat berdasarkan rekomendasi Anda!";
     } else {
       status.innerText = json.error || "Gagal membuat poster.";
     }
   } catch {
-    status.innerText = "Gagal menghubungi server pembuat gambar.";
+    status.innerText = "Gagal menghubungi server pembuat poster.";
   }
 }
 
