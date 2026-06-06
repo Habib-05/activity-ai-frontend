@@ -76,7 +76,7 @@
 
   <h3>Generate Poster Film Khusus (AI):</h3>
   <p style="font-size: 14px; color: #666;">AI akan membuat poster film fiktif berdasarkan selera riwayat Anda.</p>
-  <button id="generateBtn" style="display:inline-block;" disabled onclick="generatePoster()">Buat Poster AI</button>
+  <button id="generateBtn" disabled onclick="generatePoster()">Buat Poster AI</button>
   <div id="imageStatus" class="box" style="border:none; background:none; padding:0; min-height: auto; margin-top: 10px;">Belum ada poster.</div>
   <img id="aiImage">
 
@@ -86,7 +86,7 @@
 let riwayatPencarian = [];
 let hasilAnalisis = "";
 
-// URL backend
+// Sesuaikan dengan endpoint backend Gemini kamu
 const ANALYZE_API = "https://activity-ai-backend-hufc-ahmadhabib01012005-7558s-projects.vercel.app/api/analyze";
 const IMAGE_API = "https://activity-ai-backend-hufc-ahmadhabib01012005-7558s-projects.vercel.app/api/generate-image";
 
@@ -121,13 +121,12 @@ async function dapatkanRekomendasi() {
 
   const daftarRiwayat = riwayatPencarian.join(", ");
   const btnGenerate = document.getElementById("generateBtn");
-  btnGenerate.disabled = true;
 
   try {
     const res = await fetch(ANALYZE_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ search_history: daftarRiwayat })
+      body: JSON.stringify({ activities: daftarRiwayat })
     });
 
     const json = await res.json();
@@ -135,7 +134,7 @@ async function dapatkanRekomendasi() {
     document.getElementById("result").innerText = hasilAnalisis || json.error || "Tidak ada rekomendasi yang ditemukan.";
 
     if (hasilAnalisis) {
-      btnGenerate.disabled = false; // Aktifkan tombol poster
+      btnGenerate.disabled = false; // aktifkan tombol poster setelah rekomendasi muncul
     }
 
   } catch {
@@ -155,7 +154,7 @@ async function generatePoster() {
     const res = await fetch(IMAGE_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ themes: hasilAnalisis })
+      body: JSON.stringify({ activities: hasilAnalisis })
     });
 
     const json = await res.json();
